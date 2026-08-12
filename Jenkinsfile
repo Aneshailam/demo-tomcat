@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Maven Build') {
             steps {
                 sh 'mvn clean package'
@@ -18,7 +12,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=hello-maven'
+                    sh 'mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=hello-maven -Dsonar.projectName=hello-maven'
                 }
             }
         }
