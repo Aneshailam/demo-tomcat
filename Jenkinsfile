@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sh 'docker stop tomcat-container || true'
                 sh 'docker rm tomcat-container || true'
-                sh 'docker run -d --name tomcat-container -p 8081:8080 tomcat-app'
+                sh 'docker run -d --name tomcat-container -p 8082:8080 tomcat-app'
             }
         }
     }
