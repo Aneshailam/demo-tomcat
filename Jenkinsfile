@@ -15,6 +15,14 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=hello-maven'
+                }
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 sh 'docker build -t tomcat-app .'
