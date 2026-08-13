@@ -17,6 +17,12 @@ pipeline {
             }
         }
 
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan . --format HTML --format XML', odcInstallation: 'dependency-check'
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 sh 'docker build -t tomcat-app .'
