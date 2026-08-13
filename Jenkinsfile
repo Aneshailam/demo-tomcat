@@ -5,7 +5,7 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                sh 'mvn clean install'
+                sh 'mvn clean package'
             }
         }
 
@@ -28,11 +28,22 @@ pipeline {
         stage('OWASP Dependency Check') {
             steps {
                 withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck(
-                        additionalArguments: '--nvdApiKey $NVD_API_KEY',
-                        odcInstallation: 'dependency-check'
-                    )
+                    dependencyCheck additionalArguments: "--nvdApiKey ${NVD_API_KEY} --format HTML", odcInstallation: 'dependency-check'
                 }
+            }
+        }
+
+        stage('Publish OWASP Report') {
+            steps {
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'dependency-check-report.html',
+                    reportName: 'OWASP Dependency Check Report',
+                    reportTitles: 'OWASP Dependency Check'
+                ])
             }
         }
 
