@@ -1,3 +1,4 @@
+```groovy
 pipeline {
     agent any
 
@@ -28,7 +29,10 @@ pipeline {
         stage('OWASP Dependency Check') {
             steps {
                 withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck additionalArguments: "--nvdApiKey ${NVD_API_KEY} --format HTML", odcInstallation: 'dependency-check'
+                    dependencyCheck(
+                        additionalArguments: "--nvdApiKey ${NVD_API_KEY} --format HTML",
+                        odcInstallation: 'dependency-check'
+                    )
                 }
             }
         }
@@ -53,6 +57,20 @@ pipeline {
             }
         }
 
+        stage('Trivy Security Scan') {
+            steps {
+                sh '''
+                    trivy --config /dev/null \
+                    --ignorefile /dev/null \
+                    image \
+                    --scanners vuln \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    tomcat-app
+                '''
+            }
+        }
+
         stage('Docker Run') {
             steps {
                 sh 'docker stop tomcat-container || true'
@@ -62,3 +80,4 @@ pipeline {
         }
     }
 }
+```
